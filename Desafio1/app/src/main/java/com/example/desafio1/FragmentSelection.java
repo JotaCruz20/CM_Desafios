@@ -97,12 +97,8 @@ public class FragmentSelection extends Fragment {
 
                 EditFragment editFragment = new EditFragment();
                 editFragment.setArguments(bundle);
-
-                getActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragmentContainerView2, editFragment)
-                        .addToBackStack(null)
-                        .commit();
+                FragmentSwitch fc= (FragmentSwitch) getActivity();
+                fc.replaceFragment(editFragment);
 
             }
         });

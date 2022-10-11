@@ -30,7 +30,6 @@ public class EditFragment extends Fragment {
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
     public static EditFragment newInstance(String param1) {
         EditFragment fragment = new EditFragment();
         Bundle args = new Bundle();
@@ -67,13 +66,9 @@ public class EditFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 model.changeAnimal(editName.getText().toString(), Integer.parseInt(editAge.getText().toString()), selected);
-
-                getActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragmentContainerView2, new FragmentSelection())
-                        .addToBackStack(null)
-                        .commit();
-
+                Fragment fr = new FragmentSelection();
+                FragmentSwitch fc= (FragmentSwitch) getActivity();
+                fc.replaceFragment(fr);
             }
         });
 

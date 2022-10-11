@@ -9,20 +9,12 @@ import java.util.ArrayList;
 
 public class SharedViewModel extends ViewModel {
     private final SavedStateHandle state;
-    private MutableLiveData<Integer> selected;
     private MutableLiveData<ArrayList<Animal>> animals = new MutableLiveData<>();
 
     public SharedViewModel(SavedStateHandle state) {
         this.state = state;
     }
 
-    public LiveData<Integer> getSelected() {
-        return selected;
-    }
-
-    public void setSelected(int selected) {
-        this.selected.setValue(selected);
-    }
 
     public ArrayList<Animal> getAnimals() {
         return this.animals.getValue();
