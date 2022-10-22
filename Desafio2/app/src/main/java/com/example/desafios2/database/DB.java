@@ -1,4 +1,4 @@
-package com.example.desafios2;
+package com.example.desafios2.database;
 
 import android.content.ContentValues;
 import android.content.Context;

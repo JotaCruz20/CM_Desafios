@@ -1,12 +1,10 @@
-package com.example.desafios2;
+package com.example.desafios2.fragments;
 
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -21,6 +19,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.desafios2.R;
+import com.example.desafios2.database.DB;
+import com.example.desafios2.database.Note;
+import com.example.desafios2.database.SharedViewModel;
 
 import java.util.ArrayList;
 

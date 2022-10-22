@@ -1,4 +1,4 @@
-package com.example.desafios2;
+package com.example.desafios2.database;
 
 import android.provider.BaseColumns;
 
