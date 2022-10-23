@@ -45,6 +45,7 @@ public class PopupWindowFrag {
             @Override
             public void onClick(View v) {
                 db.deleteNote(id);
+                popupWindow.dismiss();
             }
         });
 

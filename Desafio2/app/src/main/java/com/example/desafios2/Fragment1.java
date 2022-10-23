@@ -60,11 +60,11 @@ public class Fragment1 extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.search:  {
-                System.out.println("TESTE 1");
                 return true;
             }
             case R.id.add: {
-                System.out.println("TESTE 2");
+                FragmentSwitch fc= (FragmentSwitch) getActivity();
+                fc.replaceFragment(new Fragment2());
                 return true;
             }
             default:
@@ -114,4 +114,5 @@ public class Fragment1 extends Fragment {
 
         return view;
     }
+
 }

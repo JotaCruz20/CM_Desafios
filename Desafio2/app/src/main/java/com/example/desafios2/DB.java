@@ -40,13 +40,12 @@ public class DB {
         Cursor mCursor = database.query(true, NOTE_TABLE, cols, null
                 , null, null, null, null, null);
         if (mCursor != null) {
-            mCursor.moveToFirst();
-            do {
+            while (mCursor.moveToNext()){
                 String id = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_ID));
                 String title = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_TITLE));
                 String body = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_BODY));
                 notes.add(new Note(id,title,body));
-            } while (mCursor.moveToNext());
+            }
 
         }
         return notes; // iterate to get each value.
