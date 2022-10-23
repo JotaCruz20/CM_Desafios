@@ -1,4 +1,4 @@
-package com.example.desafios2.fragments;
+package com.example.desafios2;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -7,9 +7,6 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
-
-import com.example.desafios2.R;
-import com.example.desafios2.database.SharedViewModel;
 
 public class MainActivity extends AppCompatActivity implements FragmentSwitch{
 

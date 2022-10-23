@@ -1,10 +1,12 @@
-package com.example.desafios2.fragments;
+package com.example.desafios2;
 
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -19,11 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.example.desafios2.R;
-import com.example.desafios2.database.DB;
-import com.example.desafios2.database.Note;
-import com.example.desafios2.database.SharedViewModel;
 
 import java.util.ArrayList;
 
@@ -102,16 +99,15 @@ public class Fragment1 extends Fragment {
         adapter.setOnItemClickListener(new Adapter.ClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                //Toast.makeText(MainActivity.this, "Click on " + position, Toast.LENGTH_SHORT).show();
-                //Toast.makeText(MainActivity.this, "Click on " + position + " data = " + adapter.getItem(position), Toast.LENGTH_SHORT).show();
+                /** ABRIR PARA O FRAG2 **/
             }
         });
 
         adapter.setOnItemLongClickListener(new Adapter.LongClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                //Toast.makeText(MainActivity.this, "Click on " + position, Toast.LENGTH_SHORT).show();
-                //Toast.makeText(MainActivity.this, "Click on " + position + " data = " + adapter.getItem(position), Toast.LENGTH_SHORT).show();
+                PopupWindowFrag popUpClass = new PopupWindowFrag();
+                popUpClass.showPopupWindow(v, notes.get(position).getTitle(), notes.get(position).getId(), db);
             }
         });
         this.recyclerView.setAdapter(adapter);

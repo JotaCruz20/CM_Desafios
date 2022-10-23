@@ -1,4 +1,4 @@
-package com.example.desafios2.database;
+package com.example.desafios2;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -52,8 +52,23 @@ public class DB {
         return notes; // iterate to get each value.
     }
 
-    public boolean deleteTitle(String id)
+    public boolean deleteNote(String id)
     {
         return database.delete(NOTE_TABLE, NOTE_ID + "=" + id, null) > 0;
+    }
+
+    public boolean update(String id,String title, String body)
+    {
+        ContentValues cv = new ContentValues();
+        cv.put(NOTE_TITLE, title);
+        cv.put(NOTE_BODY,body);
+        return database.update(NOTE_TABLE, cv,NOTE_ID + "= ?",  new String[]{id}) > 0;
+    }
+
+    public boolean updateTitle(String id,String title)
+    {
+        ContentValues cv = new ContentValues();
+        cv.put(NOTE_TITLE, title);
+        return database.update(NOTE_TABLE, cv,NOTE_ID + "= ?",  new String[]{id}) > 0;
     }
 }

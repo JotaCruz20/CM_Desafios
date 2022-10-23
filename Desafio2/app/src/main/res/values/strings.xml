@@ -4,4 +4,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="procura">Procura Notas</string>
     <string name="nota">Nova Nota</string>
+    <string name="delete">Eliminar Nota</string>
+    <string name="update">Alterar Titulo</string>
 </resources>

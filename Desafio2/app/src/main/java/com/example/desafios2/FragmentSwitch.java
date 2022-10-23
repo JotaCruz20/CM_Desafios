@@ -1,4 +1,4 @@
-package com.example.desafios2.fragments;
+package com.example.desafios2;
 
 import androidx.fragment.app.Fragment;
 

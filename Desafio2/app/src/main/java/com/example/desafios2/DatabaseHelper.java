@@ -1,4 +1,4 @@
-package com.example.desafios2.database;
+package com.example.desafios2;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

@@ -1,5 +1,6 @@
-package com.example.desafios2.fragments;
+package com.example.desafios2;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,9 +8,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.desafios2.R;
-import com.example.desafios2.database.Note;
 
 import java.util.ArrayList;
 
