@@ -21,6 +21,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.appcompat.widget.SearchView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -28,13 +30,13 @@ public class Fragment1 extends Fragment {
 
     private ViewModel model;
     private View view;
+    private Adapter adapter;
     RecyclerView recyclerView;
 
     public Fragment1() {
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
     public static Fragment1 newInstance() {
         Fragment1 fragment = new Fragment1();
         Bundle args = new Bundle();
@@ -53,6 +55,24 @@ public class Fragment1 extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.search);
+
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filter(query, true);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filter(newText, false);
+                return false;
+            }
+        });
 
     }
 
@@ -73,6 +93,28 @@ public class Fragment1 extends Fragment {
 
     }
 
+    private void filter(String text, boolean mode) {
+        ArrayList<Note> filteredlist = new ArrayList<Note>();
+
+        DB db = new DB(getActivity());
+        ArrayList<Note> notes = db.selectRecords();
+
+        for (Note item : notes) {
+            if (item.getTitle().toLowerCase().startsWith(text.toLowerCase())) {
+                filteredlist.add(item);
+            }
+        }
+        if (filteredlist.isEmpty()) {
+            if(mode) {
+                Toast.makeText(this.view.getContext(), "No Data Found..", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            this.adapter.filterList(filteredlist);
+        }
+    }
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -89,12 +131,11 @@ public class Fragment1 extends Fragment {
         myToolbar.setBackground(colorDrawable);
 
         DB db = new DB(getActivity());
-        ArrayList<Note> notes = db.selectRecords();
 
         this.recyclerView = this.view.findViewById(R.id.noteList);
         recyclerView.setHasFixedSize(true);
         this.recyclerView.setLayoutManager(new LinearLayoutManager(this.view.getContext()));
-        Adapter adapter = new Adapter(notes);
+        this.adapter = new Adapter(db.selectRecords());
 
         adapter.setOnItemClickListener(new Adapter.ClickListener() {
             @Override
@@ -107,7 +148,7 @@ public class Fragment1 extends Fragment {
             @Override
             public void onItemClick(int position, View v) {
                 PopupWindowFrag popUpClass = new PopupWindowFrag();
-                popUpClass.showPopupWindow(v, notes.get(position).getTitle(), notes.get(position).getId(), db);
+                popUpClass.showPopupWindow(v, db.selectRecords().get(position).getTitle(), db.selectRecords().get(position).getId(), db, adapter);
             }
         });
         this.recyclerView.setAdapter(adapter);

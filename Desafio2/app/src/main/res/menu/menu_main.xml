@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:compat="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
     <item
         android:id="@+id/add"
         android:icon="@drawable/ic_menu_btn_add"
@@ -12,6 +15,7 @@
         android:id="@+id/search"
         android:icon="@drawable/ic_menu_btn_search"
         android:title="@string/procura"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
         compat:showAsAction="ifRoom"
         />
 </menu>

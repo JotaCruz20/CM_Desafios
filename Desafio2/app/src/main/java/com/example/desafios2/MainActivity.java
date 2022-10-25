@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements FragmentSwitch{
         // SO PARA TESTAR DAR DELETE A ISTO DEPOIS
         //DB db = new DB(this);
         //db.createRecords("1","TESTE","TESTE!123");
+        //db.createRecords("2","ABC","TESTE123");
+        //db.createRecords("3","PAULO","TESTE!1234567");
         //DAR DELETE
 
         if (savedInstanceState == null) {

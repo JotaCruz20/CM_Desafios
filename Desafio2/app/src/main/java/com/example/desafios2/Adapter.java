@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,13 +13,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
+public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
     ArrayList<Note> notesList;
     private ClickListener clickListener;
     private LongClickListener longClickListener;
 
     public Adapter(ArrayList<Note> notesList) {
         this.notesList = notesList;
+    }
+
+    public void filterList(ArrayList<Note> filterlist) {
+        this.notesList = filterlist;
+        notifyDataSetChanged();
+    }
+
+    public void setNotesList(ArrayList<Note> notesList) {
+        this.notesList = notesList;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -51,6 +63,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     void setOnItemLongClickListener(LongClickListener longClickListener) {
         this.longClickListener = longClickListener;
     }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView titleOutput;
