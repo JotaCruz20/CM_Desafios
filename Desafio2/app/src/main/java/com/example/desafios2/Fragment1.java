@@ -15,23 +15,32 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.appcompat.widget.SearchView;
+
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class Fragment1 extends Fragment {
+public class Fragment1 extends Fragment implements  AsyncTask.Callback{
 
     private ViewModel model;
     private View view;
     private Adapter adapter;
     RecyclerView recyclerView;
+    DB db;
 
     public Fragment1() {
         // Required empty public constructor
@@ -79,11 +88,11 @@ public class Fragment1 extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.search:  {
+            case R.id.search: {
                 return true;
             }
             case R.id.add: {
-                FragmentSwitch fc= (FragmentSwitch) getActivity();
+                FragmentSwitch fc = (FragmentSwitch) getActivity();
                 fc.replaceFragment(new Fragment2());
                 return true;
             }
@@ -105,14 +114,13 @@ public class Fragment1 extends Fragment {
             }
         }
         if (filteredlist.isEmpty()) {
-            if(mode) {
+            if (mode) {
                 Toast.makeText(this.view.getContext(), "No Data Found..", Toast.LENGTH_SHORT).show();
             }
         } else {
             this.adapter.filterList(filteredlist);
         }
     }
-
 
 
     @Override
@@ -130,7 +138,7 @@ public class Fragment1 extends Fragment {
         // Set BackgroundDrawable
         myToolbar.setBackground(colorDrawable);
 
-        DB db = new DB(getActivity());
+        this.db = new DB(getActivity());
 
         this.recyclerView = this.view.findViewById(R.id.noteList);
         recyclerView.setHasFixedSize(true);
@@ -147,8 +155,7 @@ public class Fragment1 extends Fragment {
         adapter.setOnItemLongClickListener(new Adapter.LongClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                PopupWindowFrag popUpClass = new PopupWindowFrag();
-                popUpClass.showPopupWindow(v, db.selectRecords().get(position).getTitle(), db.selectRecords().get(position).getId(), db, adapter);
+                showPopupWindow(v, db.selectRecords().get(position).getTitle(), db.selectRecords().get(position).getId(), db, adapter);
             }
         });
         this.recyclerView.setAdapter(adapter);
@@ -156,4 +163,62 @@ public class Fragment1 extends Fragment {
         return view;
     }
 
+    public void showPopupWindow(final View view, String title, String id, DB db, Adapter adapter) {
+        LayoutInflater inflater = (LayoutInflater) view.getContext().getSystemService(view.getContext().LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_window, null);
+
+
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
+        int height = LinearLayout.LayoutParams.MATCH_PARENT;
+
+
+        boolean focusable = true;
+
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+
+        Button buttonEdit = popupView.findViewById(R.id.delete);
+        Button buttonUpdate = popupView.findViewById(R.id.update);
+        EditText editText = popupView.findViewById(R.id.updateTitle);
+        editText.setText(title);
+        buttonEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AsyncTask asyncTask = new AsyncTask();
+                asyncTask.executeAsyncDelete(id, db,Fragment1.this);
+                popupWindow.dismiss();
+            }
+
+        });
+
+        buttonUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.updateTitle(id, editText.getText().toString());
+                adapter.setNotesList(db.selectRecords());
+                adapter.notifyDataSetChanged();
+                popupWindow.dismiss();
+            }
+        });
+
+
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                db.updateTitle(id, editText.getText().toString());
+                adapter.setNotesList(db.selectRecords());
+                adapter.notifyDataSetChanged();
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public void onComplete() {
+        adapter.setNotesList(db.selectRecords());
+        adapter.notifyDataSetChanged();
+    }
 }
