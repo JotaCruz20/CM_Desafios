@@ -56,6 +56,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
         return R.layout.note_layout;
     }
 
+
+
     void setOnItemClickListener(ClickListener clickListener) {
         this.clickListener = clickListener;
     }
@@ -63,8 +65,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
     void setOnItemLongClickListener(LongClickListener longClickListener) {
         this.longClickListener = longClickListener;
     }
-
-
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView titleOutput;
 

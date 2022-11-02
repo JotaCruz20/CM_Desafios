@@ -34,9 +34,9 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class Fragment1 extends Fragment implements  AsyncTask.Callback{
+public class Fragment1 extends Fragment{
 
-    private ViewModel model;
+    private SharedViewModel sharedViewModel;
     private View view;
     private Adapter adapter;
     RecyclerView recyclerView;
@@ -58,7 +58,7 @@ public class Fragment1 extends Fragment implements  AsyncTask.Callback{
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        this.model = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
+        this.sharedViewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
     }
 
     @Override
@@ -144,6 +144,8 @@ public class Fragment1 extends Fragment implements  AsyncTask.Callback{
         recyclerView.setHasFixedSize(true);
         this.recyclerView.setLayoutManager(new LinearLayoutManager(this.view.getContext()));
         this.adapter = new Adapter(db.selectRecords());
+        sharedViewModel.setAdapter(this.adapter);
+        sharedViewModel.setDB(this.db);
 
         adapter.setOnItemClickListener(new Adapter.ClickListener() {
             @Override
@@ -186,8 +188,7 @@ public class Fragment1 extends Fragment implements  AsyncTask.Callback{
         buttonEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AsyncTask asyncTask = new AsyncTask();
-                asyncTask.executeAsyncDelete(id, db,Fragment1.this);
+                sharedViewModel.deleteNote(id);
                 popupWindow.dismiss();
             }
 
@@ -196,9 +197,7 @@ public class Fragment1 extends Fragment implements  AsyncTask.Callback{
         buttonUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db.updateTitle(id, editText.getText().toString());
-                adapter.setNotesList(db.selectRecords());
-                adapter.notifyDataSetChanged();
+                sharedViewModel.updateTitleNote(id,editText.getText().toString());
                 popupWindow.dismiss();
             }
         });
@@ -207,18 +206,10 @@ public class Fragment1 extends Fragment implements  AsyncTask.Callback{
         popupView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                db.updateTitle(id, editText.getText().toString());
-                adapter.setNotesList(db.selectRecords());
-                adapter.notifyDataSetChanged();
+                sharedViewModel.updateTitleNote(id,editText.getText().toString());
                 popupWindow.dismiss();
                 return true;
             }
         });
-    }
-
-    @Override
-    public void onComplete() {
-        adapter.setNotesList(db.selectRecords());
-        adapter.notifyDataSetChanged();
     }
 }
