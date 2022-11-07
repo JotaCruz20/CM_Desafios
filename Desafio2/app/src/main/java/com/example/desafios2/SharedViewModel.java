@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class SharedViewModel extends ViewModel implements  AsyncTask.Callback{
     private final SavedStateHandle state;
-    private MutableLiveData<String> noteId = new MutableLiveData<>();
+    private MutableLiveData<Integer> noteId = new MutableLiveData<>();
     private MutableLiveData<Adapter> adapter = new MutableLiveData<>();
     private MutableLiveData<DB> db = new MutableLiveData<>();
     private AsyncTask asyncTask = new AsyncTask();
@@ -25,19 +25,27 @@ public class SharedViewModel extends ViewModel implements  AsyncTask.Callback{
         this.db.setValue(db);
     }
 
-    public void updateNote(String id,String title, String body){
+    public void updateNote(int id,String title, String body){
 
     }
 
-    public void createNote(String id, String title, String body){
-
+    public void createNote(String title, String body){
+        asyncTask.executeAsyncCreate(this.db.getValue(), title, body,SharedViewModel.this);
     }
 
-    public void updateTitleNote(String id,String title){
+    public int getNoteId() {
+        return this.noteId.getValue();
+    }
+
+    public void setNoteId(int noteId) {
+        this.noteId.setValue(noteId);
+    }
+
+    public void updateTitleNote(int id, String title){
         asyncTask.executeAsyncUpdateTitle(id,title,this.db.getValue(),SharedViewModel.this);
     }
 
-    public void deleteNote(String id){
+    public void deleteNote(int id){
         asyncTask.executeAsyncDelete(id,this.db.getValue(),SharedViewModel.this);
     }
 

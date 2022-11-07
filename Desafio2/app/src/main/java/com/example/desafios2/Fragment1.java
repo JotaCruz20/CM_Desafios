@@ -92,6 +92,7 @@ public class Fragment1 extends Fragment{
                 return true;
             }
             case R.id.add: {
+                sharedViewModel.setNoteId(0);
                 FragmentSwitch fc = (FragmentSwitch) getActivity();
                 fc.replaceFragment(new Fragment2());
                 return true;
@@ -151,6 +152,9 @@ public class Fragment1 extends Fragment{
             @Override
             public void onItemClick(int position, View v) {
                 /** ABRIR PARA O FRAG2 **/
+                sharedViewModel.setNoteId(db.selectRecords().get(position).getId());
+                FragmentSwitch fc = (FragmentSwitch) getActivity();
+                fc.replaceFragment(new Fragment2());
             }
         });
 
@@ -165,7 +169,7 @@ public class Fragment1 extends Fragment{
         return view;
     }
 
-    public void showPopupWindow(final View view, String title, String id, DB db, Adapter adapter) {
+    public void showPopupWindow(final View view, String title, int id, DB db, Adapter adapter) {
         LayoutInflater inflater = (LayoutInflater) view.getContext().getSystemService(view.getContext().LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.popup_window, null);
 

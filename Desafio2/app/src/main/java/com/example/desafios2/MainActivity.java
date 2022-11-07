@@ -25,10 +25,10 @@ public class MainActivity extends AppCompatActivity implements FragmentSwitch{
 
         SharedViewModel model = new ViewModelProvider(this).get(SharedViewModel.class);
         // SO PARA TESTAR DAR DELETE A ISTO DEPOIS
-        //DB db = new DB(this);
-        //db.createRecords("1","TESTE","TESTE!123");
-        //db.createRecords("2","ABC","TESTE123");
-        //db.createRecords("3","PAULO","TESTE!1234567");
+        DB db = new DB(this);
+        db.createRecords("TESTE","TESTE!123");
+        db.createRecords("ABC","TESTE123");
+        db.createRecords("PAULO","TESTE!1234567");
         //DAR DELETE
 
         if (savedInstanceState == null) {

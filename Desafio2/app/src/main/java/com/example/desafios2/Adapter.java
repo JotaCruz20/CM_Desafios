@@ -44,6 +44,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Note note = notesList.get(position);
         holder.titleOutput.setText(note.getTitle());
+        holder.bodyOutput.setText(note.getBody());
     }
 
     @Override
@@ -67,10 +68,13 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
     }
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView titleOutput;
+        TextView bodyOutput;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             titleOutput = itemView.findViewById(R.id.Title);
+            bodyOutput = itemView.findViewById(R.id.textView_notes);
 
             if (clickListener != null) {
                 itemView.setOnClickListener(this);

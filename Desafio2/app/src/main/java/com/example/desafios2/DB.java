@@ -26,9 +26,8 @@ public class DB {
     }
 
 
-    public long createRecords(String id, String title, String body) {
+    public long createRecords(String title, String body) {
         ContentValues values = new ContentValues();
-        values.put(NOTE_ID, id);
         values.put(NOTE_TITLE, title);
         values.put(NOTE_BODY, body);
         return database.insert(NOTE_TABLE, null, values);
@@ -41,7 +40,7 @@ public class DB {
                 , null, null, null, null, null);
         if (mCursor != null) {
             while (mCursor.moveToNext()){
-                String id = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_ID));
+                int id = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_ID));
                 String title = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_TITLE));
                 String body = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_BODY));
                 notes.add(new Note(id,title,body));
@@ -51,12 +50,12 @@ public class DB {
         return notes; // iterate to get each value.
     }
 
-    public boolean deleteNote(String id)
+    public boolean deleteNote(int id)
     {
         return database.delete(NOTE_TABLE, NOTE_ID + "=" + id, null) > 0;
     }
 
-    public boolean update(String id,String title, String body)
+    public boolean update(int id,String title, String body)
     {
         ContentValues cv = new ContentValues();
         cv.put(NOTE_TITLE, title);
@@ -64,7 +63,7 @@ public class DB {
         return database.update(NOTE_TABLE, cv,NOTE_ID + "= ?",  new String[]{id}) > 0;
     }
 
-    public boolean updateTitle(String id,String title)
+    public boolean updateTitle(int id,String title)
     {
         ContentValues cv = new ContentValues();
         cv.put(NOTE_TITLE, title);

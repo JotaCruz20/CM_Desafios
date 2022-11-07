@@ -14,7 +14,7 @@ public class AsyncTask {
         void onComplete();
     }
 
-    public void executeAsyncDelete(String id, DB db, Callback callback){
+    public void executeAsyncDelete(int id, DB db, Callback callback){
         executor.execute(() -> {
             db.deleteNote(id);
             handler.post(() -> {
@@ -23,7 +23,7 @@ public class AsyncTask {
         });
     }
 
-    public void executeAsyncUpdate(String id, String title, String body, DB db, Callback callback){
+    public void executeAsyncUpdate(int id, String title, String body, DB db, Callback callback){
         executor.execute(() -> {
             db.update(id,title,body);
             handler.post(() -> {
@@ -32,7 +32,7 @@ public class AsyncTask {
         });
     }
 
-    public void executeAsyncUpdateTitle(String id, String title, DB db, Callback callback){
+    public void executeAsyncUpdateTitle(int id, String title, DB db, Callback callback){
         executor.execute(() -> {
             db.updateTitle(id,title);
             handler.post(() -> {
@@ -41,9 +41,10 @@ public class AsyncTask {
         });
     }
 
-    public void executeAsyncCreate(DB db, Callback callback){
+    public void executeAsyncCreate(DB db, String title, String body, Callback callback){
         executor.execute(() -> {
             // QUALQUER COISA AQUI PARA CRIAR
+            db.createRecords(title, body);
             handler.post(() -> {
                 callback.onComplete();
             });
