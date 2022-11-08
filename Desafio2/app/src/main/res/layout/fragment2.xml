@@ -13,7 +13,8 @@
         android:id="@+id/toolbar_notes"
         android:title="@string/app_name"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize">
+        android:layout_height="?attr/actionBarSize"
+        android:layout_marginTop="20px">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -21,6 +22,16 @@
             <ImageView
                 android:id="@+id/imageView_save"
                 android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_save"
+                android:padding="8dp"
+                android:layout_marginRight="20dp"
+                android:background="@android:color/transparent"
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="?attr/actionBarSize"/>
+
+            <ImageView
+                android:id="@+id/imageView_back"
+                android:layout_alignParentStart="true"
                 android:src="@drawable/ic_save"
                 android:padding="8dp"
                 android:background="@android:color/transparent"

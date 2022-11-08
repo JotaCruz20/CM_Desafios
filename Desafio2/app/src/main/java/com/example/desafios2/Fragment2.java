@@ -85,8 +85,8 @@ public class Fragment2 extends Fragment implements AsyncTask.Callback {
     @Override
     public void onCompleteNote(Note note) {
         this.note = note;
-        editText_notes.setText(note.getTitle());
-        editText_title.setText(note.getBody());
+        editText_notes.setText(note.getBody());
+        editText_title.setText(note.getTitle());
     }
 
     @Override
