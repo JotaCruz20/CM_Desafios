@@ -4,12 +4,10 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
 
-import java.util.ArrayList;
 
-public class SharedViewModel extends ViewModel implements  AsyncTask.Callback{
+public class SharedViewModel extends ViewModel{
     private final SavedStateHandle state;
-    private MutableLiveData<Integer> noteId = new MutableLiveData<>();
-    private MutableLiveData<Adapter> adapter = new MutableLiveData<>();
+    private MutableLiveData<String> noteId = new MutableLiveData<>();
     private MutableLiveData<DB> db = new MutableLiveData<>();
     private AsyncTask asyncTask = new AsyncTask();
 
@@ -17,41 +15,40 @@ public class SharedViewModel extends ViewModel implements  AsyncTask.Callback{
         this.state = state;
     }
 
-    public void setAdapter(Adapter adapter){
-        this.adapter.setValue(adapter);
-    }
 
     public void setDB(DB db){
         this.db.setValue(db);
     }
 
-    public void updateNote(int id,String title, String body){
-
+    public void updateNote(String id,String title, String body, AsyncTask.Callback callback){
+        asyncTask.executeAsyncUpdate(id,title,body,this.db.getValue(),callback);
     }
 
-    public void createNote(String title, String body){
-        asyncTask.executeAsyncCreate(this.db.getValue(), title, body,SharedViewModel.this);
+    public void createNote(String title, String body, AsyncTask.Callback callback){
+        asyncTask.executeAsyncCreate(this.db.getValue(), title, body,callback);
     }
 
-    public int getNoteId() {
+    public String getNoteId() {
         return this.noteId.getValue();
     }
 
-    public void setNoteId(int noteId) {
+    public void setNoteId(String noteId) {
         this.noteId.setValue(noteId);
     }
 
-    public void updateTitleNote(int id, String title){
-        asyncTask.executeAsyncUpdateTitle(id,title,this.db.getValue(),SharedViewModel.this);
+    public void updateTitleNote(String id, String title, AsyncTask.Callback callback){
+        asyncTask.executeAsyncUpdateTitle(id,title,this.db.getValue(),callback);
     }
 
-    public void deleteNote(int id){
-        asyncTask.executeAsyncDelete(id,this.db.getValue(),SharedViewModel.this);
+    public void deleteNote(String id, AsyncTask.Callback callback){
+        asyncTask.executeAsyncDelete(id,this.db.getValue(),callback);
     }
 
-    @Override
-    public void onComplete() {
-        this.adapter.getValue().setNotesList(this.db.getValue().selectRecords());
-        this.adapter.getValue().notifyDataSetChanged();
+    public void getNotes(AsyncTask.Callback callback, boolean isFilter){
+        asyncTask.executeAsyncSelectNotes(this.db.getValue(),callback, isFilter);
+    }
+
+    public void getNote(String id,AsyncTask.Callback callback){
+        asyncTask.executeAsyncSelectNote(id,this.db.getValue(),callback);
     }
 }

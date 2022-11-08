@@ -3,12 +3,11 @@ package com.example.desafios2;
 import android.provider.BaseColumns;
 
 public class Note {
-    private String title, body;
-    private int id;
+    private String id,title, body;
 
     public Note(){};
 
-    public Note(int id, String title, String body) {
+    public Note(String id, String title, String body) {
         this.id = id;
         this.title = title;
         this.body = body;
@@ -30,11 +29,11 @@ public class Note {
         this.body = body;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 }

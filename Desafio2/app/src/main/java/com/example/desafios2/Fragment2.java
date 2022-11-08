@@ -1,11 +1,9 @@
 package com.example.desafios2;
 
-import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,49 +12,25 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.util.Date;
+import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link Fragment2#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class Fragment2 extends Fragment {
+
+public class Fragment2 extends Fragment implements AsyncTask.Callback {
 
     private SharedViewModel sharedViewModel;
     private View view;
-    DB db;
+    private Note note;
 
     EditText editText_title, editText_notes;
     ImageView imageView_save;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public Fragment2() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment Fragment2.
-     */
-    // TODO: Rename and change types and number of parameters
     public static Fragment2 newInstance(String param1, String param2) {
         Fragment2 fragment = new Fragment2();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -66,10 +40,8 @@ public class Fragment2 extends Fragment {
         super.onCreate(savedInstanceState);
         this.sharedViewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
 
-        try {
-            this.sharedViewModel.getNoteId();
-        } catch (Exception e){
-            e.printStackTrace();
+        if (!this.sharedViewModel.getNoteId().equals("0")){
+            this.sharedViewModel.getNote(this.sharedViewModel.getNoteId(),Fragment2.this);
         }
     }
 
@@ -82,11 +54,6 @@ public class Fragment2 extends Fragment {
         editText_title = this.view.findViewById(R.id.editText_title);
         editText_notes = this.view.findViewById(R.id.editText_notes);
 
-        //if(sharedViewModel.getNoteId() != 0){
-        //    editText_notes.setText();
-        //    editText_title.setText();
-        //}
-
         imageView_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,8 +65,11 @@ public class Fragment2 extends Fragment {
                     return;
                 }
 
-                if (sharedViewModel.getNoteId() == 0){
-                    sharedViewModel.createNote(title, description);
+                if (note == null){
+                    sharedViewModel.createNote(title, description, Fragment2.this);
+                }
+                else{
+                    sharedViewModel.updateNote(note.getId(),title,description,Fragment2.this);
                 }
 
                 FragmentSwitch fc = (FragmentSwitch) getActivity();
@@ -111,6 +81,15 @@ public class Fragment2 extends Fragment {
         return this.view;
     }
 
-    private void finish() {
+
+    @Override
+    public void onCompleteNote(Note note) {
+        this.note = note;
+        editText_notes.setText(note.getTitle());
+        editText_title.setText(note.getBody());
+    }
+
+    @Override
+    public void onCompleteNotes(ArrayList<Note> notes, boolean isFilter) {
     }
 }

@@ -34,13 +34,13 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class Fragment1 extends Fragment{
+public class Fragment1 extends Fragment implements AsyncTask.Callback{
 
     private SharedViewModel sharedViewModel;
     private View view;
     private Adapter adapter;
     RecyclerView recyclerView;
-    DB db;
+    private ArrayList<Note> notes;
 
     public Fragment1() {
         // Required empty public constructor
@@ -59,6 +59,7 @@ public class Fragment1 extends Fragment{
         setHasOptionsMenu(true);
 
         this.sharedViewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
+        this.sharedViewModel.getNotes(Fragment1.this,false);
     }
 
     @Override
@@ -92,7 +93,7 @@ public class Fragment1 extends Fragment{
                 return true;
             }
             case R.id.add: {
-                sharedViewModel.setNoteId(0);
+                sharedViewModel.setNoteId("0");
                 FragmentSwitch fc = (FragmentSwitch) getActivity();
                 fc.replaceFragment(new Fragment2());
                 return true;
@@ -106,8 +107,7 @@ public class Fragment1 extends Fragment{
     private void filter(String text, boolean mode) {
         ArrayList<Note> filteredlist = new ArrayList<Note>();
 
-        DB db = new DB(getActivity());
-        ArrayList<Note> notes = db.selectRecords();
+        this.sharedViewModel.getNotes(Fragment1.this, true);
 
         for (Note item : notes) {
             if (item.getTitle().toLowerCase().startsWith(text.toLowerCase())) {
@@ -120,6 +120,7 @@ public class Fragment1 extends Fragment{
             }
         } else {
             this.adapter.filterList(filteredlist);
+            this.adapter.notifyDataSetChanged();
         }
     }
 
@@ -139,20 +140,15 @@ public class Fragment1 extends Fragment{
         // Set BackgroundDrawable
         myToolbar.setBackground(colorDrawable);
 
-        this.db = new DB(getActivity());
-
         this.recyclerView = this.view.findViewById(R.id.noteList);
         recyclerView.setHasFixedSize(true);
         this.recyclerView.setLayoutManager(new LinearLayoutManager(this.view.getContext()));
-        this.adapter = new Adapter(db.selectRecords());
-        sharedViewModel.setAdapter(this.adapter);
-        sharedViewModel.setDB(this.db);
+        this.adapter = new Adapter(this.notes);
 
         adapter.setOnItemClickListener(new Adapter.ClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                /** ABRIR PARA O FRAG2 **/
-                sharedViewModel.setNoteId(db.selectRecords().get(position).getId());
+                sharedViewModel.setNoteId(notes.get(position).getId());
                 FragmentSwitch fc = (FragmentSwitch) getActivity();
                 fc.replaceFragment(new Fragment2());
             }
@@ -161,7 +157,7 @@ public class Fragment1 extends Fragment{
         adapter.setOnItemLongClickListener(new Adapter.LongClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                showPopupWindow(v, db.selectRecords().get(position).getTitle(), db.selectRecords().get(position).getId(), db, adapter);
+                showPopupWindow(v, notes.get(position).getTitle(), notes.get(position).getId());
             }
         });
         this.recyclerView.setAdapter(adapter);
@@ -169,7 +165,7 @@ public class Fragment1 extends Fragment{
         return view;
     }
 
-    public void showPopupWindow(final View view, String title, int id, DB db, Adapter adapter) {
+    public void showPopupWindow(final View view, String title, String id) {
         LayoutInflater inflater = (LayoutInflater) view.getContext().getSystemService(view.getContext().LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.popup_window, null);
 
@@ -192,7 +188,7 @@ public class Fragment1 extends Fragment{
         buttonEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sharedViewModel.deleteNote(id);
+                sharedViewModel.deleteNote(id, Fragment1.this);
                 popupWindow.dismiss();
             }
 
@@ -201,7 +197,7 @@ public class Fragment1 extends Fragment{
         buttonUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sharedViewModel.updateTitleNote(id,editText.getText().toString());
+                sharedViewModel.updateTitleNote(id,editText.getText().toString(),Fragment1.this);
                 popupWindow.dismiss();
             }
         });
@@ -210,10 +206,24 @@ public class Fragment1 extends Fragment{
         popupView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                sharedViewModel.updateTitleNote(id,editText.getText().toString());
+                sharedViewModel.updateTitleNote(id,editText.getText().toString(),Fragment1.this);
                 popupWindow.dismiss();
                 return true;
             }
         });
+    }
+
+
+    @Override
+    public void onCompleteNote(Note note) {
+    }
+
+    @Override
+    public void onCompleteNotes(ArrayList<Note> notes, boolean isFilter) {
+        if(!isFilter) {
+            this.notes = notes;
+            this.adapter.setNotesList(notes);
+            this.adapter.notifyDataSetChanged();
+        }
     }
 }

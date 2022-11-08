@@ -24,12 +24,8 @@ public class MainActivity extends AppCompatActivity implements FragmentSwitch{
         setContentView(R.layout.activity_main);
 
         SharedViewModel model = new ViewModelProvider(this).get(SharedViewModel.class);
-        // SO PARA TESTAR DAR DELETE A ISTO DEPOIS
         DB db = new DB(this);
-        db.createRecords("TESTE","TESTE!123");
-        db.createRecords("ABC","TESTE123");
-        db.createRecords("PAULO","TESTE!1234567");
-        //DAR DELETE
+        model.setDB(db);
 
         if (savedInstanceState == null) {
             this.replaceFragment(new Fragment1());

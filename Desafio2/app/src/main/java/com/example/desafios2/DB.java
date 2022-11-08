@@ -33,14 +33,14 @@ public class DB {
         return database.insert(NOTE_TABLE, null, values);
     }
 
-    public ArrayList<Note> selectRecords() {
+    public ArrayList<Note> selectNotes() {
         ArrayList<Note> notes = new ArrayList<>();
         String[] cols = new String[]{NOTE_ID, NOTE_TITLE, NOTE_BODY};
         Cursor mCursor = database.query(true, NOTE_TABLE, cols, null
                 , null, null, null, null, null);
         if (mCursor != null) {
             while (mCursor.moveToNext()){
-                int id = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_ID));
+                String id = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_ID));
                 String title = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_TITLE));
                 String body = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_BODY));
                 notes.add(new Note(id,title,body));
@@ -50,12 +50,23 @@ public class DB {
         return notes; // iterate to get each value.
     }
 
-    public boolean deleteNote(int id)
+    public Note selectNote(String id) {
+        String[] cols = new String[]{NOTE_ID, NOTE_TITLE, NOTE_BODY};
+        String where = NOTE_ID + " = ?";
+        String[] whereArgs = {id};
+
+        Cursor cursor =  database.query(NOTE_TABLE,cols,where,whereArgs,null,null,null,null);
+
+        cursor.moveToNext();
+        return new Note(cursor.getString(cursor.getColumnIndexOrThrow(NOTE_ID)),cursor.getString(cursor.getColumnIndexOrThrow(NOTE_TITLE)),cursor.getString(cursor.getColumnIndexOrThrow(NOTE_BODY))); // iterate to get each value.
+    }
+
+    public boolean deleteNote(String id)
     {
         return database.delete(NOTE_TABLE, NOTE_ID + "=" + id, null) > 0;
     }
 
-    public boolean update(int id,String title, String body)
+    public boolean update(String id,String title, String body)
     {
         ContentValues cv = new ContentValues();
         cv.put(NOTE_TITLE, title);
@@ -63,7 +74,7 @@ public class DB {
         return database.update(NOTE_TABLE, cv,NOTE_ID + "= ?",  new String[]{id}) > 0;
     }
 
-    public boolean updateTitle(int id,String title)
+    public boolean updateTitle(String id,String title)
     {
         ContentValues cv = new ContentValues();
         cv.put(NOTE_TITLE, title);
