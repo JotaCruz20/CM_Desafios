@@ -55,6 +55,9 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
 
     @Override
     public int getItemCount() {
+        if(notesList==null){
+            return 0;
+        }
         return notesList.size();
     }
 

@@ -22,7 +22,7 @@ public class Fragment2 extends Fragment implements AsyncTask.Callback {
     private Note note;
 
     EditText editText_title, editText_notes;
-    ImageView imageView_save;
+    ImageView imageView_save, imageView_back;
 
     public Fragment2() {
         // Required empty public constructor
@@ -51,6 +51,7 @@ public class Fragment2 extends Fragment implements AsyncTask.Callback {
 
         this.view = inflater.inflate(R.layout.fragment2, container, false);
         imageView_save = this.view.findViewById(R.id.imageView_save);
+        imageView_back = this.view.findViewById(R.id.imageView_back);
         editText_title = this.view.findViewById(R.id.editText_title);
         editText_notes = this.view.findViewById(R.id.editText_notes);
 
@@ -72,6 +73,14 @@ public class Fragment2 extends Fragment implements AsyncTask.Callback {
                     sharedViewModel.updateNote(note.getId(),title,description,Fragment2.this);
                 }
 
+                FragmentSwitch fc = (FragmentSwitch) getActivity();
+                fc.replaceFragment(new Fragment1());
+            }
+        });
+
+        imageView_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 FragmentSwitch fc = (FragmentSwitch) getActivity();
                 fc.replaceFragment(new Fragment1());
             }
