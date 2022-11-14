@@ -20,7 +20,6 @@ public class DB {
     public final static String NOTE_ID = "_id";
     public final static String NOTE_TITLE = "title";
     public final static String NOTE_BODY = "body";
-    public final static String NOTE_ACCEPTED = "accepted";
     public final static String TOPIC_NAME = "name";
 
     /**
@@ -29,15 +28,14 @@ public class DB {
     public DB(Context context) {
         dbHelper = new DatabaseHelper(context);
         database = dbHelper.getWritableDatabase();
-        //dbHelper.onUpgrade(database, 0 ,1);
+        //dbHelper.onUpgrade(database, 1 ,0);
     }
 
 
-    public long createRecords(String title, String body, Boolean status) {
+    public long createRecords(String title, String body) {
         ContentValues values = new ContentValues();
         values.put(NOTE_TITLE, title);
         values.put(NOTE_BODY, body);
-        values.put(NOTE_ACCEPTED, status);
         return database.insert(NOTE_TABLE, null, values);
     }
 
@@ -68,7 +66,7 @@ public class DB {
 
     public ArrayList<Note> selectNotes() {
         ArrayList<Note> notes = new ArrayList<>();
-        String[] cols = new String[]{NOTE_ID, NOTE_TITLE, NOTE_BODY, NOTE_ACCEPTED};
+        String[] cols = new String[]{NOTE_ID, NOTE_TITLE, NOTE_BODY};
         Cursor mCursor = database.query(true, NOTE_TABLE, cols, null
                 , null, null, null, null, null);
         if (mCursor != null) {
@@ -76,10 +74,8 @@ public class DB {
                 String id = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_ID));
                 String title = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_TITLE));
                 String body = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_BODY));
-                String status = mCursor.getString(mCursor.getColumnIndexOrThrow(NOTE_ACCEPTED));
 
-                Note a = new Note(id,title,body, status);
-                Log.w(TAG, "1status: " + a.getStatus());
+                Note a = new Note(id,title,body);
                 notes.add(a);
             }
 
@@ -88,15 +84,14 @@ public class DB {
     }
 
     public Note selectNote(String id) {
-        String[] cols = new String[]{NOTE_ID, NOTE_TITLE, NOTE_BODY, NOTE_ACCEPTED};
+        String[] cols = new String[]{NOTE_ID, NOTE_TITLE, NOTE_BODY};
         String where = NOTE_ID + " = ?";
         String[] whereArgs = {id};
 
         Cursor cursor =  database.query(NOTE_TABLE,cols,where,whereArgs,null,null,null,null);
 
         cursor.moveToNext();
-        return new Note(cursor.getString(cursor.getColumnIndexOrThrow(NOTE_ID)),cursor.getString(cursor.getColumnIndexOrThrow(NOTE_TITLE)),cursor.getString(cursor.getColumnIndexOrThrow(NOTE_BODY)),
-                cursor.getString(cursor.getColumnIndexOrThrow(NOTE_ACCEPTED))); // iterate to get each value.
+        return new Note(cursor.getString(cursor.getColumnIndexOrThrow(NOTE_ID)),cursor.getString(cursor.getColumnIndexOrThrow(NOTE_TITLE)),cursor.getString(cursor.getColumnIndexOrThrow(NOTE_BODY))); // iterate to get each value.
     }
 
     public boolean deleteNote(String id)
@@ -116,13 +111,6 @@ public class DB {
     {
         ContentValues cv = new ContentValues();
         cv.put(NOTE_TITLE, title);
-        return database.update(NOTE_TABLE, cv,NOTE_ID + "= ?",  new String[]{id}) > 0;
-    }
-
-    public boolean updateStatus(String id,Boolean status)
-    {
-        ContentValues cv = new ContentValues();
-        cv.put(NOTE_ACCEPTED, status);
         return database.update(NOTE_TABLE, cv,NOTE_ID + "= ?",  new String[]{id}) > 0;
     }
 }

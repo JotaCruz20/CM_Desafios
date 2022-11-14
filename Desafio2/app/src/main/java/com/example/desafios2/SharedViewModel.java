@@ -28,9 +28,9 @@ import java.util.Objects;
 
 public class SharedViewModel extends AndroidViewModel {
     private MutableLiveData<String> noteId = new MutableLiveData<>();
-    private MutableLiveData<DB> db = new MutableLiveData<>();
-    private AsyncTask asyncTask = new AsyncTask();
-
+    private MutableLiveData<String> newFromTopic = new MutableLiveData<>();
+    private final MutableLiveData<DB> db = new MutableLiveData<>();
+    private final AsyncTask asyncTask = new AsyncTask();
     private MQTTHelper helper;
     private String name = "name";
 
@@ -38,6 +38,12 @@ public class SharedViewModel extends AndroidViewModel {
         super(application);
     }
 
+    public MutableLiveData<String> getNewFromTopic() {
+        if (newFromTopic == null) {
+            newFromTopic = new MutableLiveData<String>();
+        }
+        return newFromTopic;
+    }
 
     public void setDB(DB db){
         this.db.setValue(db);
@@ -45,6 +51,10 @@ public class SharedViewModel extends AndroidViewModel {
 
     public void updateNote(String id,String title, String body, AsyncTask.Callback callback){
         asyncTask.executeAsyncUpdate(id,title,body,this.db.getValue(),callback);
+    }
+
+    public void insertNote(String title, String body) {
+        this.db.getValue().createRecords(title, body);
     }
 
     public void createNote(String title, String body, AsyncTask.Callback callback){
@@ -67,14 +77,6 @@ public class SharedViewModel extends AndroidViewModel {
         asyncTask.executeAsyncDelete(id,this.db.getValue(),callback);
     }
 
-    public void refreshNotes(AsyncTask.Callback callback){
-        asyncTask.executeAsyncRefresh(this.db.getValue(),callback);
-    }
-
-    public void acceptNote(String id, AsyncTask.Callback callback){
-        asyncTask.executeAsyncAccept(id,this.db.getValue(),callback);
-    }
-
     public void getNotes(AsyncTask.Callback callback, boolean isFilter){
         asyncTask.executeAsyncSelectNotes(this.db.getValue(),callback, isFilter);
     }
@@ -90,6 +92,7 @@ public class SharedViewModel extends AndroidViewModel {
             return null;
         }
     }
+
 
     public long insertTopic(String topic_name){
         return Objects.requireNonNull(this.db.getValue()).createTopic(topic_name);
@@ -130,14 +133,12 @@ public class SharedViewModel extends AndroidViewModel {
             @Override
             // here!
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-                String[] arrOfStr = message.toString().split("\\|");
+                String[] arrOfStr = message.toString().split("\\|", 2);
+                String id = arrOfStr[0];
 
-                // esta parte vai ser para tirar!
-                db.getValue().createRecords(arrOfStr[1], arrOfStr[2], false);
-
-                if (getNote(arrOfStr[0]) == null) {
-                    db.getValue().createRecords(arrOfStr[1], arrOfStr[2], false);
-                }
+                //if (getNote(id) == null) {
+                    getNewFromTopic().setValue(arrOfStr[1]);
+                //}
             }
 
             @Override

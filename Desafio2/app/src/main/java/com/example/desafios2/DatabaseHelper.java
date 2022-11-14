@@ -12,7 +12,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 2;
 
     // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table Notes ( _id integer primary key autoincrement ,title text not null, body text not null, accepted bool not null);";
+    private static final String DATABASE_CREATE = "create table Notes ( _id integer primary key autoincrement ,title text not null, body text not null);";
     private static final String TOPICS_CREATE = "create table Topic ( name text primary key);";
 
     public DatabaseHelper(Context context) {

@@ -44,12 +44,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Note note = notesList.get(position);
         holder.titleOutput.setText(note.getTitle());
-        holder.status = note.getStatus();
-        if (note.getStatus()) {
-            holder.bodyOutput.setText(note.getBody());
-        } else {
-            holder.bodyOutput.setText("You must accept note to read its content");
-        }
+        holder.bodyOutput.setText(note.getBody());
 
     }
 
@@ -76,7 +71,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView titleOutput;
         TextView bodyOutput;
-        Boolean status;
 
 
 
@@ -108,9 +102,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
 
         @Override
         public boolean onLongClick(View view) {
-            if (longClickListener != null && status) {
-                longClickListener.onItemClick(getAdapterPosition(), view);
-            }
+            longClickListener.onItemClick(getAdapterPosition(), view);
             System.out.println("LONG CLICK");
             return true;
         }

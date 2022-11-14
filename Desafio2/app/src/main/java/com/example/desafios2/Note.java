@@ -8,19 +8,13 @@ import java.util.Objects;
 
 public class Note {
     private String id,title, body;
-    private boolean status;
 
     public Note(){};
 
-    public Note(String id, String title, String body, String status) {
+    public Note(String id, String title, String body) {
         this.id = id;
         this.title = title;
         this.body = body;
-        this.status = parseBool(status);
-    }
-
-    private Boolean parseBool(String bool) {
-        return !Objects.equals(bool, "0");
     }
 
     public String getTitle() {
@@ -33,14 +27,6 @@ public class Note {
 
     public String getBody() {
         return body;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
     }
 
     public void setBody(String body) {

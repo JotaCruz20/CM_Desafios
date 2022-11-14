@@ -2,21 +2,17 @@ package com.example.desafios2;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
-import android.annotation.SuppressLint;
-import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,17 +33,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-
 import java.util.ArrayList;
 
-public class Fragment1 extends Fragment implements AsyncTask.Callback{
+public class Fragment1 extends Fragment implements AsyncTask.Callback {
 
     private SharedViewModel sharedViewModel;
     private View view;
@@ -74,6 +65,15 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
         this.sharedViewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
         this.sharedViewModel.getNotes(Fragment1.this,false);
         this.sharedViewModel.connection();
+
+        final Observer<String> topicObserver = newMsg -> {
+            String[] arrOfStr = newMsg.split("\\|");
+            String Title = arrOfStr[0];
+            String Body = arrOfStr[1];
+
+            showPopupAcceptWindow(view, Title, Body);
+        };
+        sharedViewModel.getNewFromTopic().observe(this, topicObserver);
     }
 
 
@@ -151,7 +151,6 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
 
         Button subscribeButton = view.findViewById(R.id.subscribe);
         Button unsubscribeButton = view.findViewById(R.id.unsubscribe);
-        Button refreshButton = view.findViewById(R.id.refresh);
 
         ColorDrawable colorDrawable
                 = new ColorDrawable(Color.parseColor("#a81c00"));
@@ -167,13 +166,9 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
         adapter.setOnItemClickListener(new Adapter.ClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                if (!notes.get(position).getStatus()) {
-                    showPopupAcceptWindow(v, notes.get(position).getId());
-                } else {
-                    sharedViewModel.setNoteId(notes.get(position).getId());
-                    FragmentSwitch fc = (FragmentSwitch) getActivity();
-                    fc.replaceFragment(new Fragment2());
-                }
+                sharedViewModel.setNoteId(notes.get(position).getId());
+                FragmentSwitch fc = (FragmentSwitch) getActivity();
+                fc.replaceFragment(new Fragment2());
             }
         });
 
@@ -197,16 +192,7 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
         unsubscribeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // aparece um popup para inserir o nome do tópico!
                 showPopupUnsubWindow(v);
-            }
-
-        });
-
-        refreshButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sharedViewModel.refreshNotes(Fragment1.this);
             }
 
         });
@@ -418,7 +404,7 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
         });
     }
 
-    public void showPopupAcceptWindow(final View view, String id) {
+    public void showPopupAcceptWindow(View v, String Title, String Body) {
         LayoutInflater inflater = (LayoutInflater) view.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.popup_accept, null);
 
@@ -440,7 +426,7 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
         acceptNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sharedViewModel.acceptNote(id, Fragment1.this);
+                sharedViewModel.createNote(Title, Body, Fragment1.this);
                 popupWindow.dismiss();
             }
 
@@ -449,7 +435,6 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
         deleteNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sharedViewModel.deleteNote(id, Fragment1.this);
                 popupWindow.dismiss();
             }
 
@@ -477,4 +462,6 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
             this.adapter.notifyDataSetChanged();
         }
     }
+
+
 }
