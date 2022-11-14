@@ -1,18 +1,41 @@
 package com.example.desafios2;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
+import android.app.Application;
+import android.content.Context;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.SavedStateHandle;
-import androidx.lifecycle.ViewModel;
+
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Objects;
 
 
-public class SharedViewModel extends ViewModel{
-    private final SavedStateHandle state;
+public class SharedViewModel extends AndroidViewModel {
     private MutableLiveData<String> noteId = new MutableLiveData<>();
     private MutableLiveData<DB> db = new MutableLiveData<>();
     private AsyncTask asyncTask = new AsyncTask();
 
-    public SharedViewModel(SavedStateHandle state) {
-        this.state = state;
+    private MQTTHelper helper;
+    private String name = "name";
+
+    public SharedViewModel(@NonNull Application application) {
+        super(application);
     }
 
 
@@ -44,11 +67,100 @@ public class SharedViewModel extends ViewModel{
         asyncTask.executeAsyncDelete(id,this.db.getValue(),callback);
     }
 
+    public void refreshNotes(AsyncTask.Callback callback){
+        asyncTask.executeAsyncRefresh(this.db.getValue(),callback);
+    }
+
+    public void acceptNote(String id, AsyncTask.Callback callback){
+        asyncTask.executeAsyncAccept(id,this.db.getValue(),callback);
+    }
+
     public void getNotes(AsyncTask.Callback callback, boolean isFilter){
         asyncTask.executeAsyncSelectNotes(this.db.getValue(),callback, isFilter);
     }
 
     public void getNote(String id,AsyncTask.Callback callback){
         asyncTask.executeAsyncSelectNote(id,this.db.getValue(),callback);
+    }
+
+    public Note getNote(String id){
+        try {
+            return this.db.getValue().selectNote(id);
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
+    public long insertTopic(String topic_name){
+        return Objects.requireNonNull(this.db.getValue()).createTopic(topic_name);
+    }
+
+    public boolean deleteTopic(String topic_name){
+        return Objects.requireNonNull(this.db.getValue()).deleteTopic(topic_name);
+    }
+
+    public ArrayList<Topic> getTopics(){
+        return this.db.getValue().getTopics();
+    }
+
+    // -------------------- MQTT -----------------------------
+
+    public MQTTHelper getHelper() {
+        return helper;
+    }
+
+    public void connection() {
+        helper = new MQTTHelper(getApplication().getApplicationContext(), name);
+
+        helper.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean reconnect, String serverURI) {
+                ArrayList<Topic> topics = Objects.requireNonNull(db.getValue()).getTopics();
+
+                for (Topic topic: topics) {
+                    helper.subscribeToTopic(topic.getTopic_name());
+                }
+            }
+
+            @Override
+            public void connectionLost(Throwable cause) {
+                //disconnect
+            }
+
+            @Override
+            // here!
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+                String[] arrOfStr = message.toString().split("\\|");
+
+                // esta parte vai ser para tirar!
+                db.getValue().createRecords(arrOfStr[1], arrOfStr[2], false);
+
+                if (getNote(arrOfStr[0]) == null) {
+                    db.getValue().createRecords(arrOfStr[1], arrOfStr[2], false);
+                }
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {}
+        });
+        helper.connect();
+    }
+
+    public void publishNote(MQTTHelper client, String msg, int qos, String topic, boolean init)
+    {
+        try {
+            byte[] encodedPayload;
+
+            if (init)
+                msg = client.getName().toUpperCase() + ":" + msg;
+
+            encodedPayload = msg.getBytes(StandardCharsets.UTF_8);
+            MqttMessage message = new MqttMessage(encodedPayload);
+            message.setQos(qos);
+
+            client.mqttAndroidClient.publish(topic, message);
+        } catch (Exception e){
+            Log.w(TAG, "MQTT Exception");
+        }
     }
 }

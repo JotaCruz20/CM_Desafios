@@ -1,7 +1,10 @@
 package com.example.desafios2;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
@@ -19,6 +22,25 @@ public class AsyncTask {
     public void executeAsyncDelete(String id, DB db, Callback callback){
         executor.execute(() -> {
             db.deleteNote(id);
+            ArrayList<Note> notes = db.selectNotes();
+            handler.post(() -> {
+                callback.onCompleteNotes(notes, false);
+            });
+        });
+    }
+
+    public void executeAsyncRefresh(DB db, Callback callback){
+        executor.execute(() -> {
+            ArrayList<Note> notes = db.selectNotes();
+            handler.post(() -> {
+                callback.onCompleteNotes(notes, false);
+            });
+        });
+    }
+
+    public void executeAsyncAccept(String id, DB db, Callback callback){
+        executor.execute(() -> {
+            db.updateStatus(id, true);
             ArrayList<Note> notes = db.selectNotes();
             handler.post(() -> {
                 callback.onCompleteNotes(notes, false);
@@ -66,7 +88,7 @@ public class AsyncTask {
 
     public void executeAsyncCreate(DB db, String title, String body, Callback callback){
         executor.execute(() -> {
-            db.createRecords(title, body);
+            db.createRecords(title, body, true);
             ArrayList<Note> notes = db.selectNotes();
             handler.post(() -> {
                 callback.onCompleteNotes(notes, false);

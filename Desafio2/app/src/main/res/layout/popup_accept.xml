@@ -19,43 +19,28 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/newTitle"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
+                android:id="@+id/acceptTitle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/update"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:padding="10dp"/>
-
-
-            <EditText
-                android:id="@+id/updateTitle"
-                android:layout_width="189dp"
-                android:layout_height="73dp"
                 android:layout_gravity="center"
+                android:hint="@string/accept_note"
                 android:padding="10dp"
-                android:text="@string/update"
+                android:text=""
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
             <Button
-                android:id="@+id/update"
+                android:id="@+id/accept"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/update" />
-
-            <Button
-                android:id="@+id/share"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/share" />
+                android:text="@string/accept" />
 
             <Button
                 android:id="@+id/delete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/delete" />
+                android:text="@string/delete_note" />
+
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>

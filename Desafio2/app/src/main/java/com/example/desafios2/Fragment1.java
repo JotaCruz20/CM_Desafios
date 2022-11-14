@@ -1,5 +1,11 @@
 package com.example.desafios2;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
+import android.annotation.SuppressLint;
+import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -15,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,7 +37,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.util.ArrayList;
 
@@ -60,7 +73,9 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
 
         this.sharedViewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
         this.sharedViewModel.getNotes(Fragment1.this,false);
+        this.sharedViewModel.connection();
     }
+
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
@@ -134,6 +149,10 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
         Toolbar myToolbar = (Toolbar) view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(myToolbar);
 
+        Button subscribeButton = view.findViewById(R.id.subscribe);
+        Button unsubscribeButton = view.findViewById(R.id.unsubscribe);
+        Button refreshButton = view.findViewById(R.id.refresh);
+
         ColorDrawable colorDrawable
                 = new ColorDrawable(Color.parseColor("#a81c00"));
 
@@ -148,9 +167,13 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
         adapter.setOnItemClickListener(new Adapter.ClickListener() {
             @Override
             public void onItemClick(int position, View v) {
-                sharedViewModel.setNoteId(notes.get(position).getId());
-                FragmentSwitch fc = (FragmentSwitch) getActivity();
-                fc.replaceFragment(new Fragment2());
+                if (!notes.get(position).getStatus()) {
+                    showPopupAcceptWindow(v, notes.get(position).getId());
+                } else {
+                    sharedViewModel.setNoteId(notes.get(position).getId());
+                    FragmentSwitch fc = (FragmentSwitch) getActivity();
+                    fc.replaceFragment(new Fragment2());
+                }
             }
         });
 
@@ -160,6 +183,34 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
                 showPopupWindow(v, notes.get(position).getTitle(), notes.get(position).getId());
             }
         });
+
+        //sharedViewModel.insertTopic(topic_temp);
+
+        subscribeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopupTopicWindow(v);
+            }
+
+        });
+
+        unsubscribeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // aparece um popup para inserir o nome do tópico!
+                showPopupUnsubWindow(v);
+            }
+
+        });
+
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sharedViewModel.refreshNotes(Fragment1.this);
+            }
+
+        });
+
         this.recyclerView.setAdapter(adapter);
 
         return view;
@@ -183,6 +234,8 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
 
         Button buttonEdit = popupView.findViewById(R.id.delete);
         Button buttonUpdate = popupView.findViewById(R.id.update);
+        Button buttonShare = popupView.findViewById(R.id.share);
+
         EditText editText = popupView.findViewById(R.id.updateTitle);
         editText.setText(title);
         buttonEdit.setOnClickListener(new View.OnClickListener() {
@@ -202,6 +255,14 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
             }
         });
 
+        buttonShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+                showPopupShareWindow(v, id);
+            }
+        });
+
 
         popupView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -213,6 +274,196 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback{
         });
     }
 
+    public void showPopupTopicWindow(final View view) {
+        LayoutInflater inflater = (LayoutInflater) view.getContext().getSystemService(view.getContext().LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_subscribe, null);
+
+
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
+        int height = LinearLayout.LayoutParams.MATCH_PARENT;
+
+
+        boolean focusable = true;
+
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+
+        Button subscribeEdit = popupView.findViewById(R.id.subscribe);
+        EditText editText = popupView.findViewById(R.id.updateTopic);
+
+        TextView errormsg = popupView.findViewById(R.id.error);
+
+        subscribeEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    if(sharedViewModel.insertTopic(editText.getText().toString()) != -1) {
+                        sharedViewModel.getHelper().subscribeToTopic(editText.getText().toString());
+                        errormsg.setText("Added topic successfully ");
+                        editText.setText("");
+                    } else {
+                        errormsg.setText("You've already subscribed this topic");
+                    }
+                    //popupWindow.dismiss();
+                } catch (Exception e) {
+                    errormsg.setText("You've already subscribed this topic");
+                }
+            }
+        });
+
+
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+    }
+
+    public void showPopupShareWindow(final View view, String id) {
+        LayoutInflater inflater = (LayoutInflater) view.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_publish, null);
+
+
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
+        int height = LinearLayout.LayoutParams.MATCH_PARENT;
+
+
+        boolean focusable = true;
+
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+
+        Button shareTopic = popupView.findViewById(R.id.send);
+        EditText topicText = popupView.findViewById(R.id.updateTitle);
+
+        shareTopic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Note note = sharedViewModel.getNote(id);
+                String msg = note.getId()+"|"+note.getTitle()+"|"+note.getBody();
+
+                // dividir as linhas e enviar por cada um
+                String [] topics = topicText.getText().toString().split("\n");
+
+                for (String topic: topics) {
+                    sharedViewModel.publishNote(sharedViewModel.getHelper(), msg, 0, topic, false);
+                    Log.w(TAG, "sent topic " + topic);
+                }
+
+                popupWindow.dismiss();
+            }
+
+        });
+
+
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+    }
+
+    public void showPopupUnsubWindow(final View view) {
+        LayoutInflater inflater = (LayoutInflater) view.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_unsubscribe, null);
+
+
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
+        int height = LinearLayout.LayoutParams.MATCH_PARENT;
+
+
+        boolean focusable = true;
+
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+
+        Button shareTopic = popupView.findViewById(R.id.unsubscribe);
+        EditText topicText = popupView.findViewById(R.id.updateTopic);
+
+        TextView errormsg = popupView.findViewById(R.id.error);
+
+        shareTopic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (!sharedViewModel.deleteTopic(topicText.getText().toString())) {
+                    errormsg.setText("You're not subscribed to topic " + topicText.getText().toString());
+                } else {
+                    sharedViewModel.getHelper().unsubscribeToTopic(topicText.getText().toString());
+                    errormsg.setText("Unsubscribed topic " + topicText.getText().toString() + " successfully");
+                    topicText.setText("");
+                }
+                //popupWindow.dismiss();
+            }
+
+        });
+
+
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+    }
+
+    public void showPopupAcceptWindow(final View view, String id) {
+        LayoutInflater inflater = (LayoutInflater) view.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_accept, null);
+
+
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
+        int height = LinearLayout.LayoutParams.MATCH_PARENT;
+
+
+        boolean focusable = true;
+
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+
+        Button acceptNote = popupView.findViewById(R.id.accept);
+        Button deleteNote = popupView.findViewById(R.id.delete);
+
+        acceptNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sharedViewModel.acceptNote(id, Fragment1.this);
+                popupWindow.dismiss();
+            }
+
+        });
+
+        deleteNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sharedViewModel.deleteNote(id, Fragment1.this);
+                popupWindow.dismiss();
+            }
+
+        });
+
+
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+    }
 
     @Override
     public void onCompleteNote(Note note) {

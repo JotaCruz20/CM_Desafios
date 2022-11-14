@@ -19,43 +19,33 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/newTitle"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
+                android:id="@+id/error"
+                android:layout_width="189dp"
                 android:layout_height="wrap_content"
-                android:text="@string/update"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:padding="10dp"/>
-
+                android:layout_gravity="center"
+                android:padding="10dp"
+                android:text=""
+                android:textSize="11sp" />
 
             <EditText
-                android:id="@+id/updateTitle"
-                android:layout_width="189dp"
+                android:id="@+id/updateTopic"
+                android:layout_width="match_parent"
                 android:layout_height="73dp"
                 android:layout_gravity="center"
                 android:padding="10dp"
-                android:text="@string/update"
+                android:text=""
+                android:hint="@string/topic_hint"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/update"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/update" />
+
 
             <Button
-                android:id="@+id/share"
+                android:id="@+id/subscribe"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/share" />
+                android:text="@string/subscribe_to_topic" />
 
-            <Button
-                android:id="@+id/delete"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/delete" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>

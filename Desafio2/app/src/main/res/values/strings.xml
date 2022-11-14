@@ -6,4 +6,21 @@
     <string name="nota">Nova Nota</string>
     <string name="delete">Eliminar Nota</string>
     <string name="update">Alterar Titulo</string>
+    <string name="button">Button</string>
+    <string name="textview">TextView</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="cancel">Cancel</string>
+    <string name="subscribe_to_topic">Subscribe to topic</string>
+    <string name="topic_hint">Enter a topic name</string>
+    <string name="send">Send to topics</string>
+    <string name="topic">Topic</string>
+    <string name="share">Partilhar Nota</string>
+    <string name="refresh">Refresh</string>
+    <string name="unsubscribe">Unsubscribe</string>
+    <string name="unsubscribe_to_topic">Unsubscribe to Topic</string>
+    <string name="insert_topic_names_one_for_each_line">Insert topic names (one for each line)</string>
+    <string name="hi">hi</string>
+    <string name="accept_note">Accept note?</string>
+    <string name="accept">Accept</string>
+    <string name="delete_note">Delete</string>
 </resources>

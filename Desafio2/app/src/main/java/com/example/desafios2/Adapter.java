@@ -44,7 +44,13 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Note note = notesList.get(position);
         holder.titleOutput.setText(note.getTitle());
-        holder.bodyOutput.setText(note.getBody());
+        holder.status = note.getStatus();
+        if (note.getStatus()) {
+            holder.bodyOutput.setText(note.getBody());
+        } else {
+            holder.bodyOutput.setText("You must accept note to read its content");
+        }
+
     }
 
     @Override
@@ -57,8 +63,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
         return R.layout.note_layout;
     }
 
-
-
     void setOnItemClickListener(ClickListener clickListener) {
         this.clickListener = clickListener;
     }
@@ -69,17 +73,20 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView titleOutput;
         TextView bodyOutput;
+        Boolean status;
+
 
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+
             titleOutput = itemView.findViewById(R.id.Title);
             bodyOutput = itemView.findViewById(R.id.textView_notes);
 
             if (clickListener != null) {
                 itemView.setOnClickListener(this);
             }
-            if (longClickListener != null) {
+            if (longClickListener != null ) {
                 itemView.setOnLongClickListener(this);
             }
         }
@@ -98,7 +105,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
 
         @Override
         public boolean onLongClick(View view) {
-            if (longClickListener != null) {
+            if (longClickListener != null && status) {
                 longClickListener.onItemClick(getAdapterPosition(), view);
             }
             System.out.println("LONG CLICK");
