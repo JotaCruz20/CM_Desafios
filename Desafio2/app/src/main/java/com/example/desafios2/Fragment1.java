@@ -71,6 +71,8 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback {
             String Title = arrOfStr[0];
             String Body = arrOfStr[1];
 
+
+
             showPopupAcceptWindow(view, Title, Body);
         };
         sharedViewModel.getNewFromTopic().observe(this, topicObserver);
@@ -338,7 +340,8 @@ public class Fragment1 extends Fragment implements AsyncTask.Callback {
                 String [] topics = topicText.getText().toString().split("\n");
 
                 for (String topic: topics) {
-                    sharedViewModel.publishNote(sharedViewModel.getHelper(), msg, 0, topic, false);
+                    // 2 - exactly one
+                    sharedViewModel.publishNote(sharedViewModel.getHelper(), msg, 2, topic, false);
                     Log.w(TAG, "sent topic " + topic);
                 }
 

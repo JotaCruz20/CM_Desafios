@@ -113,7 +113,7 @@ public class SharedViewModel extends AndroidViewModel {
     }
 
     public void connection() {
-        helper = new MQTTHelper(getApplication().getApplicationContext(), name);
+        helper = new MQTTHelper(getApplication().getApplicationContext());
 
         helper.setCallback(new MqttCallbackExtended() {
             @Override
@@ -136,9 +136,8 @@ public class SharedViewModel extends AndroidViewModel {
                 String[] arrOfStr = message.toString().split("\\|", 2);
                 String id = arrOfStr[0];
 
-                //if (getNote(id) == null) {
-                    getNewFromTopic().setValue(arrOfStr[1]);
-                //}
+                getNewFromTopic().setValue(arrOfStr[1]);
+
             }
 
             @Override

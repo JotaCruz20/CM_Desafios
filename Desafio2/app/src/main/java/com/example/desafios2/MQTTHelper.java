@@ -9,6 +9,7 @@ import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
@@ -17,12 +18,12 @@ public class MQTTHelper {
 
     // tcp://broker.hivemq.com:1883
     final String server = "tcp://broker.hivemq.com:1883"; //TODO - Place the IP here
-    final String TAG = "TAG"; //TODO - This is just for logs 
+    final String TAG = "TAG"; //TODO - This is just for logs
     private String name;
 
 
-    public MQTTHelper(Context context, String name) {
-        this.name = name;
+    public MQTTHelper(Context context) {
+        this.name = MqttClient.generateClientId();
         mqttAndroidClient = new MqttAndroidClient(context, server, name, Ack.AUTO_ACK);
     }
 
@@ -73,6 +74,7 @@ public class MQTTHelper {
             @Override
             public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                 Log.w(TAG, "Subscribed fail!");
+                Log.w(TAG, exception);
             }
         });
 
