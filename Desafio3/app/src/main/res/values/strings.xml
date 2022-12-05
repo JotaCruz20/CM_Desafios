@@ -1,0 +1,16 @@
+<resources>
+    <string name="LedOn">LED on</string>
+    <string name="LedOff">LED off</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="day">24H</string>
+    <string name="day3">3D</string>
+    <string name="week">1S</string>
+    <string name="month">1M</string>
+    <string name="month6">6M</string>
+    <string name="temp">Temperatura</string>
+    <string name="hum">Humidade</string>
+    <string name="sensor">Sensores</string>
+    <string name="empty"></string>
+    <string name="definitions">Definitions</string>
+    <string name="done">Alterar valores</string>
+</resources>

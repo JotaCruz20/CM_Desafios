@@ -22,9 +22,7 @@ public class DB {
     public final static String NOTE_BODY = "body";
     public final static String TOPIC_NAME = "name";
 
-    /**
-     * @param context
-     */
+
     public DB(Context context) {
         dbHelper = new DatabaseHelper(context);
         database = dbHelper.getWritableDatabase();
